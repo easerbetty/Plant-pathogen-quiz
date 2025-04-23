@@ -12,26 +12,28 @@
     .result { margin-top: 10px; font-weight: bold; }
     button { padding: 6px 12px; border: none; border-radius: 4px; background-color: #007bff; color: white; cursor: pointer; }
     button:hover { background-color: #0056b3; }
+    textarea { width: 100%; height: 100px; margin-top: 10px; }
   </style>
 </head>
 <body>
   <h1>🦠 Plant Pathogen Quiz</h1>
-  <p>Попробуйте угадать род патогена по фотографии поражения растения. Фото берутся с iNaturalist.</p>
+  <p>Введите список патогенов в формате: <code>Название|Поисковый_запрос</code> (одно на строку)</p>
+  <textarea id="customList" placeholder="Botrytis|botrytis\nPuccinia|puccinia"></textarea>
   <button onclick="generateQuiz()">🔄 Загрузить квиз</button>
 
   <div id="quiz" class="quiz-container"></div>
 
   <script>
-    const pathogens = [
-      { name: "Botrytis", query: "botrytis", answer: "Botrytis" },
-      { name: "Puccinia", query: "puccinia", answer: "Puccinia" },
-      { name: "Erysiphe", query: "erysiphe", answer: "Erysiphe" },
-      { name: "Phytophthora", query: "phytophthora", answer: "Phytophthora" },
-      { name: "Taphrina", query: "taphrina", answer: "Taphrina" },
-      { name: "Ustilago", query: "ustilago", answer: "Ustilago" }
-    ];
+    function parseCustomInput() {
+      const raw = document.getElementById('customList').value.trim();
+      return raw.split('\n').map(line => {
+        const [name, query] = line.split('|').map(s => s.trim());
+        return { name, query, answer: name };
+      }).filter(p => p.name && p.query);
+    }
 
     async function generateQuiz() {
+      const pathogens = parseCustomInput();
       const quiz = document.getElementById('quiz');
       quiz.innerHTML = '';
 
